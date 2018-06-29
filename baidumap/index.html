@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>百度地图测试</title>
+    <style>
+        .visual-map {
+            width: 100%;
+            height: 768px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="echarts1" class="visual-map"></div>
+</body>
+<script src="data/echarts.js"></script>
+<script src="data/china.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        fetch('data/opvisualmap.json')
+            .then(function (res) {
+                if (res.ok) {
+                    res.json().then(function(data){
+                        //console.log(data);
+                        initialMap(data)
+                    });
+                }
+            });
+
+    }
+
+    function initialMap(result){
+        //$.getJSON("/ContentBiz/POP/Js/opvisualmap.json?" + Math.random(), function (result) {
+            var logistics = new Array();
+            var customer = new Array();
+            var storehouse = new Array();
+
+            var myChart = echarts.init(document.getElementById('echarts1'));
+            myChart.showLoading();
+            
+            if (result != null) {
+                if (result.logistics != null && result.logistics.length > 0) {
+                    result.logistics.forEach(function (obj, idx) {
+                        logistics.push([obj.lng, obj.lat, 1]);
+                        // if (!$.checkIsEmpty(year) && !$.checkIsEmpty(quarter)) {
+                        //     if (parseInt(obj.year) < parseInt(year) || (parseInt(obj.year) == parseInt(year) && parseInt(obj.quarter) <= parseInt(quarter))) {
+                        //         logistics.push([obj.lng, obj.lat, 1]);
+                        //     }
+                        // } else {
+                        //     logistics.push([obj.lng, obj.lat, 1]);
+                        // }
+                    });
+                }
+
+                if (result.customer != null && result.customer.length > 0) {
+                    result.customer.forEach(function (obj, idx) {
+                        customer.push([obj.lng, obj.lat, 1]);
+                        // if (!$.checkIsEmpty(year) && !$.checkIsEmpty(quarter)) {
+                        //     if (parseInt(obj.year) < parseInt(year) || (parseInt(obj.year) == parseInt(year) && parseInt(obj.quarter) <= parseInt(quarter))) {
+                        //         customer.push([obj.lng, obj.lat, 1]);
+                        //     }
+                        // } else {
+                        //     customer.push([obj.lng, obj.lat, 1]);
+                        // }
+                    });
+                }
+
+                if (result.storehouse != null && result.storehouse.length > 0) {
+                    result.storehouse.forEach(function (obj, idx) {
+                        storehouse.push([obj.lng, obj.lat, 1]);
+                        // if (!$.checkIsEmpty(year) && !$.checkIsEmpty(quarter)) {
+                        //     if (parseInt(obj.year) < parseInt(year) || (parseInt(obj.year) == parseInt(year) && parseInt(obj.quarter) <= parseInt(quarter))) {
+                        //         storehouse.push([obj.lng, obj.lat, 1]);
+                        //     }
+                        // } else {
+                        //     storehouse.push([obj.lng, obj.lat, 1]);
+                        // }
+                    });
+                }
+            }
+
+            //console.log(logistics);
+            //console.log(customer);
+            //console.log(storehouse);
+
+            myChart.hideLoading();
+
+            myChart.setOption(option = {
+                legend: {
+                    left: '20',
+                    bottom: '20',
+                    data: ['物流公司', '客户', '仓库'],
+                    textStyle: {
+                        color: '#000'
+                    }
+                },
+                geo: {
+                    name: '运力分布',
+                    type: 'scatter',
+                    map: 'china',
+                    label: {
+                        emphasis: {
+                            show: false
+                        }
+                    },
+                    itemStyle: {
+                        normal: {
+                            // areaColor: '#323c48',
+                            areaColor: '#dcdcdc',
+                            borderColor: '#111'
+                        },
+                        emphasis: {
+                            areaColor: '#ccc'
+                        }
+                    }
+                },
+                series: [{
+                    name: '客户',
+                    type: 'scatter',
+                    coordinateSystem: 'geo',
+                    symbolSize: 5,
+                    large: true,
+                    itemStyle: {
+                        normal: {
+                            shadowBlur: 2,
+                            shadowColor: 'rgba(0,51,102, .8)',
+                            color: 'rgba(0,51,102, .8)'
+                        }
+                    },
+                    data: customer
+                }, {
+                    name: '物流公司',
+                    type: 'effectScatter',
+                    rippleEffect: {             //涟漪闪烁效果
+                        period: 5,
+                        scale: 3,
+                        brushType: 'stroke'
+                    },
+                    coordinateSystem: 'geo',
+                    symbolSize: 12,
+                    large: true,
+                    itemStyle: {
+                        normal: {
+                            shadowBlur: 2,
+                            shadowColor: 'rgba(204,51,51, .8)',
+                            color: 'rgba(255,102,102, .8)'
+                        }
+                    },
+                    data: logistics
+                }, {
+                    name: '仓库',
+                    type: 'scatter',
+                    coordinateSystem: 'geo',
+                    symbolSize: 10,
+                    large: true,
+                    label: {
+                normal: {
+                    formatter: '{b}',
+                    position: 'right',
+                    show: true
+                },
+                emphasis: {
+                    show: true
+                }
+            },
+            itemStyle: {
+                normal: {
+                    color: '#05C3F9'
+                }
+            },
+                    data: storehouse
+                }]
+            });
+            //});
+
+        //});
+    }
+</script>
+
+</html>
